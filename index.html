@@ -75,6 +75,7 @@
         padding: 1.5rem 4rem;
         background: rgba(3, 3, 3, 0.75);
         backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur); /* Added prefix here too */
         border-bottom: 1px solid var(--border);
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       }
@@ -630,14 +631,17 @@
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 2rem;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
       }
 
-      .skill-category:hover {
+      .skill-category.highlight {
         border-color: var(--accent);
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        background: rgba(251, 191, 36, 0.05);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
       }
+
 
       .skill-cat-label {
         font-family: var(--font-mono);
@@ -826,7 +830,9 @@
       /* ─────────────────────────────────────────────────── */
       @media (max-width: 768px) {
         nav {
-          padding: 1rem 1.5rem !important;
+          padding: 1rem 1.25rem !important; /* Smaller left/right padding */
+          width: 100%;
+          box-sizing: border-box;
         }
         .nav-links {
           gap: 1.5rem;
@@ -846,14 +852,23 @@
           grid-template-columns: 1fr;
         }
         .hero-stats {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-          margin-top: 3rem;
-          padding-top: 2rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1.5rem 1rem;
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          width: 100%;
+        }
+        .hero-stats > div {
+          flex: 1 1 calc(50% - 1rem);
+          min-width: 120px;
         }
         .stat-number {
-          font-size: 1.75rem;
+          font-size: 1.5rem;
+        }
+        .stat-label {
+          font-size: 0.65rem;
+          line-height: 1.3;
         }
       }
 
@@ -879,8 +894,9 @@
         background: none;
         border: none;
         cursor: pointer;
-        z-index: 1001;
-        position: relative;
+        z-index: 1002;
+        position: relative; /* Relative to Nav */
+        margin-left: auto; /* Push to right of nav flex */
       }
 
       .menu-toggle span {
@@ -888,12 +904,13 @@
         height: 2px;
         background: var(--text);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        transform-origin: left;
+        transform-origin: center;
       }
 
-      body.nav-open .menu-toggle span:nth-child(1) { transform: rotate(45deg); }
+      body.nav-open .menu-toggle span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
       body.nav-open .menu-toggle span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-      body.nav-open .menu-toggle span:nth-child(3) { transform: rotate(-45deg); }
+      body.nav-open .menu-toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
 
       .mobile-nav {
         position: fixed;
@@ -915,13 +932,14 @@
       body.nav-open .mobile-nav {
         opacity: 1;
         visibility: visible;
+        display: flex !important; /* Force flex visible */
       }
 
       .mobile-nav-links {
         list-style: none;
         display: flex;
         flex-direction: column;
-        gap: 2.5rem;
+        gap: 2rem;
         text-align: center;
       }
 
@@ -1652,9 +1670,33 @@
 
       // ── Nav shrink on scroll ──────────────────────────────
       window.addEventListener("scroll", () => {
-        document.querySelector("nav").style.padding =
-          window.scrollY > 60 ? "0.85rem 4rem" : "1.25rem 4rem";
+        const isMobile = window.innerWidth <= 768;
+        const nav = document.querySelector("nav");
+        if (isMobile) {
+          nav.style.padding = "1rem 1.5rem"; // Lock mobile padding
+        } else {
+          nav.style.padding = window.scrollY > 60 ? "0.85rem 4rem" : "1.25rem 4rem";
+        }
       });
+
+      // ── Scroll-based skill highlighting ─────────────────
+      const skillObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('highlight');
+          } else {
+            entry.target.classList.remove('highlight');
+          }
+        });
+      }, {
+        threshold: 0.2, // Lower further for mobile
+        rootMargin: "-25% 0px -25% 0px"
+      });
+
+
+
+      document.querySelectorAll('.skill-category').forEach(cat => skillObserver.observe(cat));
+
 
       // ── Contact form → mailto ─────────────────────────────
       document
