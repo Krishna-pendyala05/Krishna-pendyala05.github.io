@@ -1142,6 +1142,8 @@
           navLinks.forEach(a => a.classList.remove('active'));
           const active = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
           if (active) active.classList.add('active');
+          // Always keep URL clean — no hash ever
+          history.replaceState(null, '', window.location.pathname);
         }
       });
     }, { threshold: 0.4 });
