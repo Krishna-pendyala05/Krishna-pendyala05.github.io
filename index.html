@@ -1603,10 +1603,13 @@
 
     <!-- ── FOOTER ─────────────────────────────────────────── -->
     <footer>
-      <p>© 2025 Murali Krishna Pendyala &nbsp;·&nbsp; Built with HTML/CSS/JS &nbsp;·&nbsp; Hosted on GitHub Pages</p>
+      <p>© <span id="current-year">2026</span> Murali Krishna Pendyala &nbsp;·&nbsp; Built with HTML/CSS/JS &nbsp;·&nbsp; Hosted on GitHub Pages</p>
     </footer>
 
     <script>
+      // ── Dynamic Year ──────────────────────────────────────
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+
       // ── Utility: smooth scroll with nav offset ─────────────
       const NAV_H = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 68;
 
